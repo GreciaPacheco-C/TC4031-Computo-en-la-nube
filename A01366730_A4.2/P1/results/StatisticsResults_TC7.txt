@@ -1,0 +1,12 @@
+P1 - computeStatistics.py Results
+Input file: C:\Users\Admin\Desktop\Grecia\MNA\A01366730_A4.2\P1\data\TC7.txt
+Valid count: 12767
+Invalid tokens ignored: 2
+
+Mean: 2.4746739549971625e+20
+Median: 2.4664097307429e+20
+Mode: 1.57638329490099e+20
+Variance (population): 2.0910793147136532e+40
+Standard deviation: 1.446056470098472e+20
+
+Elapsed time (seconds): 0.04264860000057524

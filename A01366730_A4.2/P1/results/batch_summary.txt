@@ -1,0 +1,9 @@
+Batch summary for P1
+
+TC1.txt: OK -> StatisticsResults_TC1.txt
+TC2.txt: OK -> StatisticsResults_TC2.txt
+TC3.txt: OK -> StatisticsResults_TC3.txt
+TC4.txt: OK -> StatisticsResults_TC4.txt
+TC5.txt: OK -> StatisticsResults_TC5.txt
+TC6.txt: OK -> StatisticsResults_TC6.txt
+TC7.txt: OK -> StatisticsResults_TC7.txt

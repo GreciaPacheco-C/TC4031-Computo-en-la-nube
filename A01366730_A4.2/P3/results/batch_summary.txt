@@ -1,0 +1,9 @@
+Batch summary for P3
+
+TC1.txt: OK -> WordCountResults_TC1.txt
+TC2.txt: OK -> WordCountResults_TC2.txt
+TC3.txt: OK -> WordCountResults_TC3.txt
+TC4.txt: OK -> WordCountResults_TC4.txt
+TC5.txt: OK -> WordCountResults_TC5.txt
+TC6.txt: OK -> WordCountResults_TC6.txt
+TC7.txt: OK -> WordCountResults_TC7.txt
