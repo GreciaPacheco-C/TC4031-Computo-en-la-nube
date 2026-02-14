@@ -7,11 +7,10 @@ price catalogue JSON file.
 
 Expect to be executed from A01366730_A5.2 folder
 Usage:
-    python source/computeSales.py data/TC1/TC1.ProductList.json data/TC1/TC1.Sales.json
 
-Notes:
-    - Handles invalid data and continues execution (logs errors to stderr).
-    - Supports multiple reasonable JSON schemas for catalogue and sales.
+py source/computeSales.py data/TC1/TC1.ProductList.json data/TC1/TC1.Sales.json
+
+
 """
 
 from __future__ import annotations
@@ -66,68 +65,99 @@ def to_decimal(value: Any, *, context: str) -> Optional[Decimal]:
         return None
 
 
-def normalize_catalogue(raw: Any) -> Dict[str, Decimal]:
-    """Normalize a price catalogue into {product_name: price_decimal}.    """
+def _validate_price(price_val: Any, name: str) -> Optional[Decimal]:
+    """Validate price and return Decimal if valid."""
+    price = to_decimal(price_val, context=f"catalogue price for '{name}'")
+
+    if price is None:
+        return None
+
+    if price < 0:
+        eprint(f"[ERROR] Negative price for '{name}': {price}")
+        return None
+
+    return price
+
+
+def _normalize_catalogue_list(raw: List[Any]) -> Dict[str, Decimal]:
+    """Handle catalogue when JSON root is a list."""
     catalogue: Dict[str, Decimal] = {}
 
-    if raw is None:
-        return catalogue
-
-    if isinstance(raw, dict):
-        # If it's a direct mapping name->price
-        if all(isinstance(k, str) for k in raw.keys()) and any(
-            not isinstance(v, (dict, list)) for v in raw.values()
-        ):
-            for name, price_val in raw.items():
-                price = to_decimal(price_val, context=f"catalogue price for '{name}'")
-                if price is None:
-                    continue
-                if price < 0:
-                    eprint(f"[ERROR] Negative price for '{name}': {price}")
-                    continue
-                catalogue[name] = price
-            return catalogue
-
-        # If it contains a list under a common key
-        for key in ("catalogue", "products", "items"):
-            if key in raw and isinstance(raw[key], list):
-                return normalize_catalogue(raw[key])
-
-        # If dict not recognized, keep empty
-        eprint("[ERROR] Unrecognized catalogue JSON structure (dict).")
-        return catalogue
-
-    if isinstance(raw, list):
-        for idx, entry in enumerate(raw, start=1):
-            if not isinstance(entry, dict):
-                eprint(f"[ERROR] Catalogue entry #{idx} is not an object: {entry!r}")
-                continue
-
-            name = (
-                entry.get("title")
-                or entry.get("product")
-                or entry.get("name")
-                or entry.get("Product")
+    for idx, entry in enumerate(raw, start=1):
+        if not isinstance(entry, dict):
+            eprint(
+                f"[ERROR] Catalogue entry #{idx} "
+                f"is not an object: {entry!r}"
             )
-            price_val = entry.get("price") or entry.get("Price") or entry.get("cost")
+            continue
 
-            if not isinstance(name, str) or not name.strip():
-                eprint(f"[ERROR] Catalogue entry #{idx} missing product name.")
-                continue
+        name = (
+            entry.get("title")
+            or entry.get("product")
+            or entry.get("name")
+            or entry.get("Product")
+        )
 
-            price = to_decimal(price_val, context=f"catalogue price for '{name}'")
-            if price is None:
-                continue
-            if price < 0:
-                eprint(f"[ERROR] Negative price for '{name}': {price}")
-                continue
+        price_val = (
+            entry.get("price")
+            or entry.get("Price")
+            or entry.get("cost")
+        )
 
+        if not isinstance(name, str) or not name.strip():
+            eprint(
+                f"[ERROR] Catalogue entry #{idx} "
+                "missing product name."
+            )
+            continue
+
+        price = _validate_price(price_val, name)
+        if price is not None:
             catalogue[name] = price
 
-        return catalogue
-
-    eprint("[ERROR] Unrecognized catalogue JSON structure (not list/dict).")
     return catalogue
+
+
+def _normalize_direct_mapping(raw: Dict[str, Any]) -> Dict[str, Decimal]:
+    """Handle simple {product: price} mapping."""
+    catalogue: Dict[str, Decimal] = {}
+
+    for name, price_val in raw.items():
+        price = _validate_price(price_val, name)
+        if price is not None:
+            catalogue[name] = price
+
+    return catalogue
+
+
+def _normalize_catalogue_dict(raw: Dict[str, Any]) -> Dict[str, Decimal]:
+    """Handle catalogue when JSON root is a dictionary."""
+    # Direct mapping case
+    if all(isinstance(k, str) for k in raw.keys()):
+        return _normalize_direct_mapping(raw)
+
+    # Nested list under known keys
+    for key in ("catalogue", "products", "items"):
+        if key in raw and isinstance(raw[key], list):
+            return _normalize_catalogue_list(raw[key])
+
+    eprint("[ERROR] Unrecognized catalogue dictionary structure.")
+    return {}
+
+
+def normalize_catalogue(raw: Any) -> Dict[str, Decimal]:
+    """Normalize catalogue input into {product: price}"""
+    if raw is None:
+        return {}
+
+    if isinstance(raw, dict):
+        return _normalize_catalogue_dict(raw)
+
+    if isinstance(raw, list):
+        return _normalize_catalogue_list(raw)
+
+    eprint("[ERROR] Unrecognized catalogue JSON structure.")
+    return {}
 
 
 def extract_sale_lines_from_obj(obj: Any) -> List[SaleLine]:
@@ -159,7 +189,10 @@ def extract_sale_lines_from_obj(obj: Any) -> List[SaleLine]:
         if qty is None:
             return
         if qty <= 0:
-            eprint(f"[ERROR] Non-positive quantity for '{product}' in {ctx}: {qty}")
+            eprint(
+                f"[ERROR] Non-positive quantity for '{product}'"
+                f"in {ctx}: {qty}"
+            )
             return
 
         lines.append(SaleLine(product=product, quantity=qty))
@@ -194,7 +227,7 @@ def extract_sale_lines_from_obj(obj: Any) -> List[SaleLine]:
 
 
 def normalize_sales(raw: Any) -> List[List[SaleLine]]:
-    """ Normalize sales record into a list of sales, where each sale is a list of SaleLine. """
+    """ Normalize sales record into a list of sales"""
     sales: List[List[SaleLine]] = []
 
     if raw is None:
@@ -269,7 +302,10 @@ def compute_totals(
         for line in sale_lines:
             price = catalogue.get(line.product)
             if price is None:
-                msg = f"[ERROR] Unknown product '{line.product}' in Sale #{sale_idx}."
+                msg = (
+                    f"[ERROR] Unknown product '{line.product}'"
+                    f"in Sale #{sale_idx}."
+                )
                 eprint(msg)
                 errors_for_file.append(msg)
                 continue
@@ -319,15 +355,18 @@ def write_results_file(
         eprint(f"[ERROR] Cannot write results file '{path}': {exc}")
 
 
-def main(argv: List[str]) -> int:
-    """CLI entrypoint."""
-    if len(argv) != 3:
-        eprint("Usage: python computeSales.py priceCatalogue.json salesRecord.json")
-        return 2
+def build_results_path(sales_path: Path) -> Path:
+    """Build the output path for the results file based on test case folder."""
+    results_dir = Path(RESULTS_DIR)
+    results_dir.mkdir(parents=True, exist_ok=True)
 
-    catalogue_path = Path(argv[1])
-    sales_path = Path(argv[2])
+    test_case_name = sales_path.parent.name
+    results_filename = f"{test_case_name}{RESULTS_FILENAME}"
+    return results_dir / results_filename
 
+
+def run_app(catalogue_path: Path, sales_path: Path) -> None:
+    """Run the application end-to-end."""
     start = time.perf_counter()
 
     raw_catalogue = read_json_file(catalogue_path)
@@ -336,26 +375,29 @@ def main(argv: List[str]) -> int:
     catalogue = normalize_catalogue(raw_catalogue)
     sales = normalize_sales(raw_sales)
 
-    grand_total, report_lines, error_lines = compute_totals(catalogue, sales)
+    _grand_total, report_lines, error_lines = compute_totals(catalogue, sales)
 
     elapsed = time.perf_counter() - start
 
-    # Console output (human readable)
     for line in report_lines:
         print(line)
     print(f"Elapsed time: {elapsed:.6f} seconds")
 
-    # Results file
-    results_dir = Path(RESULTS_DIR)
-    results_dir.mkdir(parents=True, exist_ok=True)
-
-    test_case_name =  sales_path.parent.name
-
-    results_filename =  f"{test_case_name}{RESULTS_FILENAME}"
-    results_path = results_dir / results_filename
+    results_path = build_results_path(sales_path)
     write_results_file(results_path, report_lines, error_lines, elapsed)
-    # Exit code: 0 even if there were data issues (requirement says continue).
-    _ = grand_total
+
+
+def main(argv: List[str]) -> int:
+    """CLI entrypoint."""
+    if len(argv) != 3:
+        eprint(
+            "Usage:\n"
+            "  python source/computeSales.py "
+            "priceCatalogue.json salesRecord.json"
+        )
+        return 2
+
+    run_app(Path(argv[1]), Path(argv[2]))
     return 0
 
 

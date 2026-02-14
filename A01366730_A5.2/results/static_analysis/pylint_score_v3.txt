@@ -1,0 +1,6 @@
+************* Module computeSales
+source\computeSales.py:1:0: C0103: Module name "computeSales" doesn't conform to snake_case naming style (invalid-name)
+
+------------------------------------------------------------------
+Your code has been rated at 9.95/10 (previous run: 9.91/10, +0.05)
+

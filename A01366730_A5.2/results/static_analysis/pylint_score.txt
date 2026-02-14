@@ -1,0 +1,8 @@
+************* Module computeSales
+source\computeSales.py:1:0: C0103: Module name "computeSales" doesn't conform to snake_case naming style (invalid-name)
+source\computeSales.py:68:0: R0912: Too many branches (14/12) (too-many-branches)
+source\computeSales.py:340:0: R0914: Too many local variables (17/15) (too-many-locals)
+
+------------------------------------------------------------------
+Your code has been rated at 9.86/10 (previous run: 0.00/10, +9.86)
+
