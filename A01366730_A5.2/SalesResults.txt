@@ -1,0 +1,60 @@
+SALES REPORT
+============================================================
+Catalogue items loaded: 50
+Sales loaded: 1
+
+Sale #1
+------------------------------------------------------------
+  - Rustic breakfast | qty=1 | unit=$21.32 | line=$21.32
+  - Sandwich with salad | qty=2 | unit=$22.48 | line=$44.96
+  - Raw legums | qty=1 | unit=$17.11 | line=$17.11
+  - Fresh stawberry | qty=1 | unit=$28.59 | line=$28.59
+  - Pears juice | qty=2 | unit=$19.49 | line=$38.98
+  - Green smoothie | qty=3 | unit=$17.68 | line=$53.04
+  - Cuban sandwiche | qty=2 | unit=$18.50 | line=$37.00
+  - Hazelnut in black ceramic bowl | qty=2 | unit=$27.35 | line=$54.70
+  - Tomatoes | qty=1 | unit=$26.03 | line=$26.03
+  - Plums | qty=1 | unit=$19.18 | line=$19.18
+  - Fresh blueberries | qty=2 | unit=$21.01 | line=$42.02
+  - Green smoothie | qty=2 | unit=$17.68 | line=$35.36
+  - Corn | qty=3 | unit=$13.55 | line=$40.65
+  - French fries | qty=1 | unit=$18.32 | line=$18.32
+  - Ground beef meat burger | qty=1 | unit=$11.73 | line=$11.73
+  - Hazelnut in black ceramic bowl | qty=2 | unit=$27.35 | line=$54.70
+  - Cherry | qty=2 | unit=$14.35 | line=$28.70
+  - Homemade bread | qty=1 | unit=$17.48 | line=$17.48
+  - Smoothie with chia seeds | qty=1 | unit=$25.26 | line=$25.26
+  - Corn | qty=1 | unit=$13.55 | line=$13.55
+  - Peaches on branch | qty=2 | unit=$25.62 | line=$51.24
+  - Pesto with basil | qty=2 | unit=$18.19 | line=$36.38
+  - Plums | qty=1 | unit=$19.18 | line=$19.18
+  - Fresh blueberries | qty=2 | unit=$21.01 | line=$42.02
+  - Green smoothie | qty=4 | unit=$17.68 | line=$70.72
+  - Corn | qty=1 | unit=$13.55 | line=$13.55
+  - French fries | qty=2 | unit=$18.32 | line=$36.64
+  - Ground beef meat burger | qty=3 | unit=$11.73 | line=$35.19
+  - Hazelnut in black ceramic bowl | qty=1 | unit=$27.35 | line=$27.35
+  - Cherry | qty=2 | unit=$14.35 | line=$28.70
+  - Homemade bread | qty=5 | unit=$17.48 | line=$87.40
+  - Smoothie with chia seeds | qty=2 | unit=$25.26 | line=$50.52
+  - Corn | qty=10 | unit=$13.55 | line=$135.50
+  - Rustic breakfast | qty=2 | unit=$21.32 | line=$42.64
+  - Sandwich with salad | qty=3 | unit=$22.48 | line=$67.44
+  - Raw legums | qty=20 | unit=$17.11 | line=$342.20
+  - Fresh stawberry | qty=4 | unit=$28.59 | line=$114.36
+  - Pears juice | qty=1 | unit=$19.49 | line=$19.49
+  - Green smoothie | qty=8 | unit=$17.68 | line=$141.44
+  - Cuban sandwiche | qty=9 | unit=$18.50 | line=$166.50
+  - Hazelnut in black ceramic bowl | qty=2 | unit=$27.35 | line=$54.70
+  - Tomatoes | qty=1 | unit=$26.03 | line=$26.03
+  - Plums | qty=2 | unit=$19.18 | line=$38.36
+  - Fresh blueberries | qty=3 | unit=$21.01 | line=$63.03
+  - Green smoothie | qty=5 | unit=$17.68 | line=$88.40
+  - Corn | qty=4 | unit=$13.55 | line=$54.20
+  Valid lines: 46/46
+  Sale total: $2481.86
+
+============================================================
+GRAND TOTAL: $2481.86
+
+Elapsed time: 0.038526 seconds
