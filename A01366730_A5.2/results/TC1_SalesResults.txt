@@ -57,4 +57,4 @@ Sale #1
 ============================================================
 GRAND TOTAL: $2481.86
 
-Elapsed time: 0.038526 seconds
+Elapsed time: 0.003626 seconds

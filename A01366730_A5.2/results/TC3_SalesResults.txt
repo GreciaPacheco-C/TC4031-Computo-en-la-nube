@@ -11,7 +11,7 @@ Sale #1
 ============================================================
 GRAND TOTAL: $0.00
 
-Elapsed time: 0.005472 seconds
+Elapsed time: 0.004504 seconds
 
 ERRORS (execution continued):
 ------------------------------------------------------------

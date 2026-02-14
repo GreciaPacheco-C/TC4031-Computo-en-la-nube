@@ -11,7 +11,7 @@ Sale #1
 ============================================================
 GRAND TOTAL: $0.00
 
-Elapsed time: 0.005472 seconds
+Elapsed time: 0.004193 seconds
 
 ERRORS (execution continued):
 ------------------------------------------------------------
@@ -36,7 +36,7 @@ ERRORS (execution continued):
 [ERROR] Unknown product 'Smoothie with chia seeds' in Sale #1.
 [ERROR] Unknown product 'Corn' in Sale #1.
 [ERROR] Unknown product 'Plums' in Sale #1.
-[ERROR] Unknown product 'Elotes' in Sale #1.
+[ERROR] Unknown product 'Fresh blueberries' in Sale #1.
 [ERROR] Unknown product 'Green smoothie' in Sale #1.
 [ERROR] Unknown product 'Corn' in Sale #1.
 [ERROR] Unknown product 'French fries' in Sale #1.
@@ -49,7 +49,7 @@ ERRORS (execution continued):
 [ERROR] Unknown product 'Plums' in Sale #1.
 [ERROR] Unknown product 'Green smoothie' in Sale #1.
 [ERROR] Unknown product 'Corn' in Sale #1.
-[ERROR] Unknown product 'Frijoles' in Sale #1.
+[ERROR] Unknown product 'French fries' in Sale #1.
 [ERROR] Unknown product 'Ground beef meat burger' in Sale #1.
 [ERROR] Unknown product 'Hazelnut in black ceramic bowl' in Sale #1.
 [ERROR] Unknown product 'Sweet fresh stawberry' in Sale #1.

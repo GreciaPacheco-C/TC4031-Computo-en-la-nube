@@ -25,7 +25,7 @@ from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional, Tuple
 
 RESULTS_DIR = "results"
-RESULTS_FILENAME = "SalesResults.txt"
+RESULTS_FILENAME = "_SalesResults.txt"
 
 
 @dataclass(frozen=True)
@@ -349,7 +349,10 @@ def main(argv: List[str]) -> int:
     results_dir = Path(RESULTS_DIR)
     results_dir.mkdir(parents=True, exist_ok=True)
 
-    results_path = results_dir / RESULTS_FILENAME
+    test_case_name =  sales_path.parent.name
+
+    results_filename =  f"{test_case_name}{RESULTS_FILENAME}"
+    results_path = results_dir / results_filename
     write_results_file(results_path, report_lines, error_lines, elapsed)
     # Exit code: 0 even if there were data issues (requirement says continue).
     _ = grand_total
