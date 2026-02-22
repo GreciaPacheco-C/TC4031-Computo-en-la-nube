@@ -7,6 +7,6 @@ test_prevent_delete_if_active_reservation (test_reservation_system.ReservationSy
 test_reservation_create_and_cancel_updates_inventory (test_reservation_system.ReservationSystemTests.test_reservation_create_and_cancel_updates_inventory) ... ok
 System.Management.Automation.RemoteException
 ----------------------------------------------------------------------
-Ran 7 tests in 0.121s
+Ran 7 tests in 0.141s
 System.Management.Automation.RemoteException
 OK
