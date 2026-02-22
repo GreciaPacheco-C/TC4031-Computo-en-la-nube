@@ -1,0 +1,9 @@
+************* Module customer
+source\customer.py:98:11: E0601: Using variable 'Reservation' before assignment (used-before-assignment)
+************* Module reservation
+source\reservation.py:127:20: E0601: Using variable 'Customer' before assignment (used-before-assignment)
+source\reservation.py:132:12: E0601: Using variable 'Hotel' before assignment (used-before-assignment)
+
+------------------------------------------------------------------
+Your code has been rated at 9.63/10 (previous run: 9.63/10, +0.00)
+

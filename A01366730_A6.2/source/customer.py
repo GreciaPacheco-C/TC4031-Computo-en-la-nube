@@ -9,13 +9,14 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Dict, List, Optional,TYPE_CHECKING
+from typing import Any, Dict, List, Optional, TYPE_CHECKING
 
 from storage import JsonStore
 from hotel import ConflictError, NotFoundError
 
 if TYPE_CHECKING:
     from reservation import Reservation
+
 
 @dataclass(frozen=True)
 class Customer:
@@ -93,8 +94,6 @@ class Customer:
         customers = cls.load_all(data_dir)
         if not any(c.customer_id == customer_id for c in customers):
             raise NotFoundError(f"Customer not found: {customer_id}")
-
-        from reservation import Reservation  # pylint: disable=import-outside-toplevel
 
         if Reservation.has_active_for_customer(data_dir, customer_id):
             raise ConflictError(

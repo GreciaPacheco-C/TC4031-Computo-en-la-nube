@@ -124,9 +124,6 @@ class Reservation:
     ) -> "Reservation":
         """Create reservation and persist."""
         # Validate customer exists
-        from customer import Customer  # pylint: disable=import-outside-toplevel
-        from hotel import Hotel  # pylint: disable=import-outside-toplevel
-
         customers = Customer.load_all(data_dir)
         if not any(c.customer_id == customer_id for c in customers):
             raise NotFoundError(f"Customer not found: {customer_id}")

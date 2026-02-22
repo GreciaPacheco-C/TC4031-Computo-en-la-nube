@@ -11,13 +11,10 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Dict, List, Optional,TYPE_CHECKING
+from typing import Any, Dict, List, Optional
 
 from storage import JsonStore
 
-
-if TYPE_CHECKING:
-    from reservation import Reservation
 
 class NotFoundError(ValueError):
     """Entity not found."""
@@ -124,7 +121,8 @@ class Hotel:
         if not any(h.hotel_id == hotel_id for h in hotels):
             raise NotFoundError(f"Hotel not found: {hotel_id}")
 
-        from reservation import Reservation  # pylint: disable=import-outside-toplevel
+        # pylint: disable=import-outside-toplevel
+        from reservation import Reservation
 
         if Reservation.has_active_for_hotel(data_dir, hotel_id):
             raise ConflictError(

@@ -22,7 +22,7 @@ class ReservationSystemTests(unittest.TestCase):
     def setUp(self) -> None:
         """Create a temporary directory and seed JSON files for each test."""
         # In unittest, this pattern is correct: keep the temp dir for the test
-        # and register cleanup. Pylint prefers "with", so we disable that rule here.
+        # and register cleanup.
         # pylint: disable=consider-using-with
         self._tmp_dir = TemporaryDirectory()
         self.addCleanup(self._tmp_dir.cleanup)
@@ -114,8 +114,10 @@ class ReservationSystemTests(unittest.TestCase):
             Customer.display_customer_information(self.data_dir, "C2")
 
     def test_reservation_create_and_cancel_updates_inventory(self) -> None:
-        """Reservation: create/cancel should decrement and then restore availability."""
-        before = Hotel.display_hotel_information(self.data_dir, "H1")["rooms_available"]
+        """Reservation: create/cancel/ restore availability."""
+        before = Hotel.display_hotel_information(
+            self.data_dir, "H1"
+        )["rooms_available"]
 
         res = Reservation.create_a_reservation(
             self.data_dir,
@@ -126,13 +128,17 @@ class ReservationSystemTests(unittest.TestCase):
         )
         self.assertEqual(res.status, "ACTIVE")
 
-        mid = Hotel.display_hotel_information(self.data_dir, "H1")["rooms_available"]
+        mid = Hotel.display_hotel_information(
+            self.data_dir, "H1"
+        )["rooms_available"]
         self.assertEqual(mid, before - 2)
 
         cancelled = Reservation.cancel_a_reservation(self.data_dir, "R1")
         self.assertEqual(cancelled.status, "CANCELLED")
 
-        after = Hotel.display_hotel_information(self.data_dir, "H1")["rooms_available"]
+        after = Hotel.display_hotel_information(
+            self.data_dir, "H1"
+        )["rooms_available"]
         self.assertEqual(after, before)
 
     def test_conflict_and_not_found_paths(self) -> None:
