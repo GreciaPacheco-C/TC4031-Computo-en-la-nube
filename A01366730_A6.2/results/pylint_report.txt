@@ -1,0 +1,36 @@
+************* Module main
+source\main.py:1:0: C0114: Missing module docstring (missing-module-docstring)
+source\main.py:5:0: E0401: Unable to import 'source.customer' (import-error)
+source\main.py:6:0: E0401: Unable to import 'source.hotel' (import-error)
+source\main.py:7:0: E0401: Unable to import 'source.reservation' (import-error)
+source\main.py:10:0: C0116: Missing function or method docstring (missing-function-docstring)
+************* Module reservation
+source\reservation.py:18:0: E0401: Unable to import 'source.storage' (import-error)
+source\reservation.py:19:0: E0401: Unable to import 'source.hotel' (import-error)
+source\reservation.py:20:0: E0401: Unable to import 'source.hotel' (import-error)
+source\reservation.py:21:0: E0401: Unable to import 'source.customer' (import-error)
+source\reservation.py:61:4: C0116: Missing function or method docstring (missing-function-docstring)
+source\reservation.py:72:4: C0116: Missing function or method docstring (missing-function-docstring)
+source\reservation.py:92:4: C0116: Missing function or method docstring (missing-function-docstring)
+source\reservation.py:100:4: C0116: Missing function or method docstring (missing-function-docstring)
+source\reservation.py:107:4: R0913: Too many arguments (6/5) (too-many-arguments)
+source\reservation.py:107:4: R0917: Too many positional arguments (6/5) (too-many-positional-arguments)
+************* Module test_reservation_system
+source\test_reservation_system.py:1:0: C0114: Missing module docstring (missing-module-docstring)
+source\test_reservation_system.py:9:0: E0401: Unable to import 'source.customer' (import-error)
+source\test_reservation_system.py:10:0: E0401: Unable to import 'source.hotel' (import-error)
+source\test_reservation_system.py:11:0: E0401: Unable to import 'source.hotel' (import-error)
+source\test_reservation_system.py:12:0: E0401: Unable to import 'source.reservation' (import-error)
+source\test_reservation_system.py:15:0: C0115: Missing class docstring (missing-class-docstring)
+source\test_reservation_system.py:17:19: R1732: Consider using 'with' for resource-allocating operations (consider-using-with)
+source\test_reservation_system.py:49:4: C0116: Missing function or method docstring (missing-function-docstring)
+source\test_reservation_system.py:65:4: C0116: Missing function or method docstring (missing-function-docstring)
+source\test_reservation_system.py:83:4: C0116: Missing function or method docstring (missing-function-docstring)
+source\test_reservation_system.py:106:4: C0116: Missing function or method docstring (missing-function-docstring)
+source\test_reservation_system.py:133:4: C0116: Missing function or method docstring (missing-function-docstring)
+source\test_reservation_system.py:144:4: C0116: Missing function or method docstring (missing-function-docstring)
+source\test_reservation_system.py:157:4: C0116: Missing function or method docstring (missing-function-docstring)
+
+------------------------------------------------------------------
+Your code has been rated at 8.19/10 (previous run: 8.14/10, +0.05)
+

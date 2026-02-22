@@ -22,15 +22,34 @@ def main() -> int:
         Hotel.create_hotel(data_dir, "H100", "Tec Hotel", 10, 10)
 
     if not Customer.load_all(data_dir):
-        Customer.create_customer(data_dir, "C100", "Grecia", "grecia@example.com")
+        Customer.create_customer(
+            data_dir, "C100", "Grecia",
+            "grecia@example.com"
+        )
 
-    existing_res_ids = {r.reservation_id for r in Reservation.load_all(data_dir)}
+    reservations = Reservation.load_all(data_dir)
+    existing_res_ids = {
+        r.reservation_id
+        for r in reservations
+    }
+
     if "R100" not in existing_res_ids:
-        Reservation.create_a_reservation(data_dir, "R100", "C100", "H100", room_count=2)
+        Reservation.create_a_reservation(
+            data_dir, "R100", "C100", "H100",
+            room_count=2
+        )
 
     print("Hotels:", [h.to_dict() for h in Hotel.load_all(data_dir)])
     print("Customers:", [c.to_dict() for c in Customer.load_all(data_dir)])
-    print("Reservations:", [r.to_dict() for r in Reservation.load_all(data_dir)])
+
+    reservations = Reservation.load_all(data_dir)
+
+    reservation_dicts = [
+        r.to_dict()
+        for r in reservations
+    ]
+
+    print("Reservations:", reservation_dicts)
 
     return 0
 

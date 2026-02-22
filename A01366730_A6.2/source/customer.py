@@ -11,9 +11,9 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
-from source.storage import JsonStore
-from source.hotel import ConflictError, NotFoundError
-
+from storage import JsonStore
+from hotel import ConflictError, NotFoundError
+from reservation import Reservation
 
 @dataclass(frozen=True)
 class Customer:
@@ -38,17 +38,26 @@ class Customer:
         return Customer(customer_id=customer_id, name=name, email=email)
 
     def to_dict(self) -> Dict[str, Any]:
-        return {"customer_id": self.customer_id, "name": self.name, "email": self.email}
+        """Return a dic representation of customer"""
+        return {
+            "customer_id": self.customer_id,
+            "name": self.name,
+            "email": self.email
+            }
 
     @classmethod
     def load_all(cls, data_dir: Path) -> List["Customer"]:
+        """Load all customers from storage"""
         rows = cls._store(data_dir).load_list()
         customers: List[Customer] = []
         for idx, row in enumerate(rows):
             try:
                 customers.append(cls._from_dict(row))
             except (KeyError, TypeError, ValueError) as exc:
-                print(f"[ERROR] Invalid customer record #{idx}: {exc}. Skipped.")
+                print(
+                    f"[ERROR] Invalid customer record #{idx}:"
+                    f"{exc}. Skipped."
+                )
         return customers
 
     @classmethod
@@ -56,30 +65,46 @@ class Customer:
         cls._store(data_dir).save_list([c.to_dict() for c in customers])
 
     @classmethod
-    def create_customer(cls, data_dir: Path, customer_id: str, name: str, email: str) -> "Customer":
-        customer = cls._from_dict({"customer_id": customer_id, "name": name, "email": email})
+    def create_customer(
+        cls, data_dir: Path, customer_id: str,
+        name: str, email: str,
+    ) -> "Customer":
+        """Creates new costumer"""
+        customer = cls._from_dict(
+            {"customer_id": customer_id,
+             "name": name,
+             "email": email}
+        )
         customers = cls.load_all(data_dir)
         if any(c.customer_id == customer.customer_id for c in customers):
-            raise ConflictError(f"Customer already exists: {customer.customer_id}")
+            raise ConflictError(
+                f"Customer already exists:"
+                f" {customer.customer_id}"
+            )
         customers.append(customer)
         cls._save_all(data_dir, customers)
         return customer
 
     @classmethod
     def delete_customer(cls, data_dir: Path, customer_id: str) -> None:
+        """Deletes customer"""
         customers = cls.load_all(data_dir)
         if not any(c.customer_id == customer_id for c in customers):
             raise NotFoundError(f"Customer not found: {customer_id}")
 
-        from reservation import Reservation
         if Reservation.has_active_for_customer(data_dir, customer_id):
-            raise ConflictError("Cannot delete customer with active reservations.")
+            raise ConflictError(
+                "Cannot delete customer with active reservations."
+            )
 
         customers = [c for c in customers if c.customer_id != customer_id]
         cls._save_all(data_dir, customers)
 
     @classmethod
-    def display_customer_information(cls, data_dir: Path, customer_id: str) -> Dict[str, Any]:
+    def display_customer_information(
+        cls, data_dir: Path, customer_id: str
+    ) -> Dict[str, Any]:
+        """Loads customer information"""
         customers = cls.load_all(data_dir)
         for c in customers:
             if c.customer_id == customer_id:
@@ -94,6 +119,7 @@ class Customer:
         name: Optional[str] = None,
         email: Optional[str] = None,
     ) -> "Customer":
+        """Aux to modify customer info"""
         customers = cls.load_all(data_dir)
         updated: List[Customer] = []
         found = False

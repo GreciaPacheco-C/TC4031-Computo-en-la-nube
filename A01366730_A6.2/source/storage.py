@@ -25,13 +25,19 @@ class JsonStore:
             print(f"[WARN] File not found: {self.path}. Using empty list.")
             return []
         except OSError as exc:
-            print(f"[ERROR] Could not read {self.path}: {exc}. Using empty list.")
+            print(
+                f"[ERROR] Could not read {self.path}: {exc}. "
+                f" Using empty list."
+            )
             return []
 
         try:
             data = json.loads(text)
         except json.JSONDecodeError as exc:
-            print(f"[ERROR] Invalid JSON in {self.path}: {exc}. Using empty list.")
+            print(
+                f"[ERROR] Invalid JSON in {self.path}: {exc}."
+                f"Using empty list."
+            )
             return []
 
         if not isinstance(data, list):
@@ -43,7 +49,10 @@ class JsonStore:
             if isinstance(item, dict):
                 clean.append(item)
             else:
-                print(f"[ERROR] Item #{idx} in {self.path} is not an object; skipped.")
+                print(
+                    f"[ERROR] Item #{idx} in {self.path}"
+                    f"is not an object; skipped."
+                )
         return clean
 
     def save_list(self, rows: List[Dict[str, Any]]) -> None:

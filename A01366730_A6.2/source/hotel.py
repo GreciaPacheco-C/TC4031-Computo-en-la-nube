@@ -13,8 +13,8 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
-from source.storage import JsonStore
-
+from storage import JsonStore
+from reservation import Reservation  # local import to avoid cycles
 
 class NotFoundError(ValueError):
     """Entity not found."""
@@ -83,6 +83,8 @@ class Hotel:
         cls._store(data_dir).save_list([h.to_dict() for h in hotels])
 
     @classmethod
+    # pylint: disable=too-many-arguments
+    # pylint: disable=too-many-positional-arguments
     def create_hotel(
         cls,
         data_dir: Path,
@@ -119,16 +121,19 @@ class Hotel:
         if not any(h.hotel_id == hotel_id for h in hotels):
             raise NotFoundError(f"Hotel not found: {hotel_id}")
 
-        # Optional rule: do not delete if active reservation exists (checked in tests via Reservation)
-        from reservation import Reservation  # local import to avoid cycles
+        # Optional rule: do not delete if active reservation exists
         if Reservation.has_active_for_hotel(data_dir, hotel_id):
-            raise ConflictError("Cannot delete hotel with active reservations.")
+            raise ConflictError(
+                "Cannot delete hotel with active reservations."
+            )
 
         hotels = [h for h in hotels if h.hotel_id != hotel_id]
         cls._save_all(data_dir, hotels)
 
     @classmethod
-    def display_hotel_information(cls, data_dir: Path, hotel_id: str) -> Dict[str, Any]:
+    def display_hotel_information(
+        cls, data_dir: Path, hotel_id: str
+    ) -> Dict[str, Any]:
         """Return hotel info dict."""
         hotels = cls.load_all(data_dir)
         for h in hotels:
@@ -137,6 +142,8 @@ class Hotel:
         raise NotFoundError(f"Hotel not found: {hotel_id}")
 
     @classmethod
+    # pylint: disable=too-many-arguments
+    # pylint: disable=too-many-positional-arguments
     def modify_hotel_information(
         cls,
         data_dir: Path,
@@ -156,16 +163,30 @@ class Hotel:
                 continue
 
             found = True
+
+            new_name = h.name if name is None else str(name)
+
+            new_rooms_total = (
+                h.rooms_total
+                if rooms_total is None
+                else int(rooms_total)
+            )
+
+            new_rooms_available = (
+                h.rooms_available
+                if rooms_available is None
+                else int(rooms_available)
+            )
+
             new_hotel = cls._from_dict(
                 {
                     "hotel_id": h.hotel_id,
-                    "name": h.name if name is None else str(name),
-                    "rooms_total": h.rooms_total if rooms_total is None else int(rooms_total),
-                    "rooms_available": (
-                        h.rooms_available if rooms_available is None else int(rooms_available)
-                    ),
+                    "name": new_name,
+                    "rooms_total": new_rooms_total,
+                    "rooms_available": new_rooms_available,
                 }
             )
+
             updated_hotels.append(new_hotel)
 
         if not found:

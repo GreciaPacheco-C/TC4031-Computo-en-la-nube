@@ -11,7 +11,7 @@ Also supports Hotel.reserve_a_room and cancel restoring inventory.
 from __future__ import annotations
 
 from dataclasses import dataclass
-from datetime import datetime, timezone, timezone
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, List
 
@@ -76,16 +76,25 @@ class Reservation:
             try:
                 reservations.append(cls._from_dict(row))
             except (KeyError, TypeError, ValueError) as exc:
-                print(f"[ERROR] Invalid reservation record #{idx}: {exc}. Skipped.")
+                print(
+                    f"[ERROR] Invalid reservation record #{idx}:"
+                    f" {exc}. Skipped."
+                )
         return reservations
 
     @classmethod
-    def _save_all(cls, data_dir: Path, reservations: List["Reservation"]) -> None:
+    def _save_all(
+        cls, data_dir: Path, reservations: List["Reservation"]
+    ) -> None:
         cls._store(data_dir).save_list([r.to_dict() for r in reservations])
 
     @classmethod
     def has_active_for_hotel(cls, data_dir: Path, hotel_id: str) -> bool:
-        return any(r.hotel_id == hotel_id and r.status == "ACTIVE" for r in cls.load_all(data_dir))
+        reservations = cls.load_all(data_dir)
+        return any(
+            r.hotel_id == hotel_id and r.status == "ACTIVE"
+            for r in reservations
+        )
 
     @classmethod
     def has_active_for_customer(cls, data_dir: Path, customer_id: str) -> bool:
@@ -103,7 +112,7 @@ class Reservation:
         hotel_id: str,
         room_count: int = 1,
     ) -> "Reservation":
-        """Create reservation and persist. Also decrements hotel availability."""
+        """Create reservation and persist."""
         # Validate customer exists
         customers = Customer.load_all(data_dir)
         if not any(c.customer_id == customer_id for c in customers):
@@ -115,8 +124,10 @@ class Reservation:
 
         reservations = cls.load_all(data_dir)
         if any(r.reservation_id == reservation_id for r in reservations):
-            # rollback hotel decrement? for simplicity, treat as conflict before doing reserve in real system
-            raise ConflictError(f"Reservation already exists: {reservation_id}")
+            # rollback hotel decrement
+            raise ConflictError(
+                f"Reservation already exists: {reservation_id}"
+            )
 
         created_at = datetime.now(timezone.utc).isoformat(timespec="seconds")
         reservation = cls._from_dict(
@@ -135,7 +146,9 @@ class Reservation:
         return reservation
 
     @classmethod
-    def cancel_a_reservation(cls, data_dir: Path, reservation_id: str) -> "Reservation":
+    def cancel_a_reservation(
+        cls, data_dir: Path, reservation_id: str
+    ) -> "Reservation":
         """Cancel reservation and restore hotel availability."""
         reservations = cls.load_all(data_dir)
         found = False
@@ -153,10 +166,15 @@ class Reservation:
 
             # restore hotel availability
             hotel_info = Hotel.display_hotel_information(data_dir, r.hotel_id)
+
+            current_available = int(hotel_info["rooms_available"])
+            rooms_to_restore = int(r.room_count)
+            new_rooms_available = current_available + rooms_to_restore
+
             Hotel.modify_hotel_information(
                 data_dir,
                 r.hotel_id,
-                rooms_available=int(hotel_info["rooms_available"]) + int(r.room_count),
+                rooms_available=new_rooms_available
             )
 
             cancelled_res = cls._from_dict(
