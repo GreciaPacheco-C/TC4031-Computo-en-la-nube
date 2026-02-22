@@ -1,13 +1,23 @@
+"""
+Main class
+
+Depends on:
+ * customer
+ * hotel
+ *reservation
+"""
+
 from __future__ import annotations
 
 from pathlib import Path
 
-from source.customer import Customer
-from source.hotel import Hotel
-from source.reservation import Reservation
+from customer import Customer
+from hotel import Hotel
+from reservation import Reservation
 
 
 def main() -> int:
+    """MAIN """
     data_dir = Path(__file__).resolve().parent.parent / "data"
     data_dir.mkdir(parents=True, exist_ok=True)
 

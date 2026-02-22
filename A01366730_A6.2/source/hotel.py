@@ -11,10 +11,13 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional,TYPE_CHECKING
 
 from storage import JsonStore
-from reservation import Reservation  # local import to avoid cycles
+
+
+if TYPE_CHECKING:
+    from reservation import Reservation
 
 class NotFoundError(ValueError):
     """Entity not found."""
@@ -121,7 +124,8 @@ class Hotel:
         if not any(h.hotel_id == hotel_id for h in hotels):
             raise NotFoundError(f"Hotel not found: {hotel_id}")
 
-        # Optional rule: do not delete if active reservation exists
+        from reservation import Reservation  # pylint: disable=import-outside-toplevel
+
         if Reservation.has_active_for_hotel(data_dir, hotel_id):
             raise ConflictError(
                 "Cannot delete hotel with active reservations."

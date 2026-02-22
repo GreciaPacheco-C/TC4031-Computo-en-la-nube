@@ -1,3 +1,7 @@
+"""
+Unit tests for the Reservation System module.
+"""
+
 from __future__ import annotations
 
 import json
@@ -6,47 +10,68 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 from unittest.mock import patch
 
-from source.customer import Customer
-from source.hotel import ConflictError, NotFoundError
-from source.hotel import Hotel
-from source.reservation import Reservation
+from customer import Customer
+from hotel import ConflictError, NotFoundError
+from hotel import Hotel
+from reservation import Reservation
 
 
 class ReservationSystemTests(unittest.TestCase):
-    def setUp(self) -> None:
-        self.tmp = TemporaryDirectory()
-        self.data_dir = Path(self.tmp.name)
+    """Unit test cases for the reservation system."""
 
-        (self.data_dir / "hotels.json").write_text(
-            json.dumps(
-                [{"hotel_id": "H1",
-                  "name": "Hotel One",
-                  "rooms_total": 5,
-                  "rooms_available": 5}],
-                indent=2,
-            ) + "\n",
-            encoding="utf-8",
-        )
-        (self.data_dir / "customers.json").write_text(
-            json.dumps(
-                [{"customer_id":
-                  "C1", "name": "Alice",
-                  "email": "alice@example.com"}],
-                indent=2,
-            ) + "\n",
-            encoding="utf-8",
-        )
+    def setUp(self) -> None:
+        """Create a temporary directory and seed JSON files for each test."""
+        # In unittest, this pattern is correct: keep the temp dir for the test
+        # and register cleanup. Pylint prefers "with", so we disable that rule here.
+        # pylint: disable=consider-using-with
+        self._tmp_dir = TemporaryDirectory()
+        self.addCleanup(self._tmp_dir.cleanup)
+        self.data_dir = Path(self._tmp_dir.name)
+
+        hotels_path = self.data_dir / "hotels.json"
+        customers_path = self.data_dir / "customers.json"
         reservations_path = self.data_dir / "reservations.json"
+
+        hotels_path.write_text(
+            json.dumps(
+                [
+                    {
+                        "hotel_id": "H1",
+                        "name": "Hotel One",
+                        "rooms_total": 5,
+                        "rooms_available": 5,
+                    }
+                ],
+                indent=2,
+            )
+            + "\n",
+            encoding="utf-8",
+        )
+
+        customers_path.write_text(
+            json.dumps(
+                [
+                    {
+                        "customer_id": "C1",
+                        "name": "Alice",
+                        "email": "alice@example.com",
+                    }
+                ],
+                indent=2,
+            )
+            + "\n",
+            encoding="utf-8",
+        )
 
         reservations_path.write_text(
             "[]\n",
             encoding="utf-8",
         )
 
-    def tearDown(self) -> None:
-        self.tmp.cleanup()
+    # No tearDown needed: addCleanup already handles it.
 
     def test_hotel_crud(self) -> None:
+        """Hotel: create, display, modify, and delete."""
         created = Hotel.create_hotel(self.data_dir, "H2", "Hotel Two", 3)
         self.assertEqual(created.hotel_id, "H2")
 
@@ -54,7 +79,9 @@ class ReservationSystemTests(unittest.TestCase):
         self.assertEqual(info["rooms_available"], 3)
 
         updated = Hotel.modify_hotel_information(
-            self.data_dir, "H2", rooms_available=2
+            self.data_dir,
+            "H2",
+            rooms_available=2,
         )
         self.assertEqual(updated.rooms_available, 2)
 
@@ -63,8 +90,12 @@ class ReservationSystemTests(unittest.TestCase):
             Hotel.display_hotel_information(self.data_dir, "H2")
 
     def test_customer_crud(self) -> None:
+        """Customer: create, display, modify, and delete."""
         created = Customer.create_customer(
-            self.data_dir, "C2", "Bob", "bob@example.com"
+            self.data_dir,
+            "C2",
+            "Bob",
+            "bob@example.com",
         )
         self.assertEqual(created.customer_id, "C2")
 
@@ -72,7 +103,9 @@ class ReservationSystemTests(unittest.TestCase):
         self.assertEqual(info["name"], "Bob")
 
         updated = Customer.modify_customer_information(
-            self.data_dir, "C2", name="Bobby"
+            self.data_dir,
+            "C2",
+            name="Bobby",
         )
         self.assertEqual(updated.name, "Bobby")
 
@@ -81,49 +114,65 @@ class ReservationSystemTests(unittest.TestCase):
             Customer.display_customer_information(self.data_dir, "C2")
 
     def test_reservation_create_and_cancel_updates_inventory(self) -> None:
-        before = Hotel.display_hotel_information(
-            self.data_dir, "H1"
-        )["rooms_available"]
+        """Reservation: create/cancel should decrement and then restore availability."""
+        before = Hotel.display_hotel_information(self.data_dir, "H1")["rooms_available"]
 
         res = Reservation.create_a_reservation(
-            self.data_dir, "R1", "C1", "H1", room_count=2
+            self.data_dir,
+            "R1",
+            "C1",
+            "H1",
+            room_count=2,
         )
         self.assertEqual(res.status, "ACTIVE")
 
-        mid = Hotel.display_hotel_information(
-            self.data_dir, "H1"
-        )["rooms_available"]
+        mid = Hotel.display_hotel_information(self.data_dir, "H1")["rooms_available"]
         self.assertEqual(mid, before - 2)
 
         cancelled = Reservation.cancel_a_reservation(self.data_dir, "R1")
         self.assertEqual(cancelled.status, "CANCELLED")
 
-        after = Hotel.display_hotel_information(
-            self.data_dir, "H1"
-        )["rooms_available"]
+        after = Hotel.display_hotel_information(self.data_dir, "H1")["rooms_available"]
         self.assertEqual(after, before)
 
     def test_conflict_and_not_found_paths(self) -> None:
+        """Exercise NotFoundError and ConflictError paths."""
         with self.assertRaises(NotFoundError):
             Hotel.display_hotel_information(self.data_dir, "NOPE")
 
         with self.assertRaises(NotFoundError):
             Reservation.create_a_reservation(
-                self.data_dir, "R9", "NO_CUST", "H1", 1
+                self.data_dir,
+                "R9",
+                "NO_CUST",
+                "H1",
+                1,
             )
 
         with self.assertRaises(ConflictError):
             Reservation.create_a_reservation(
-                self.data_dir, "R2", "C1", "H1", room_count=999
+                self.data_dir,
+                "R2",
+                "C1",
+                "H1",
+                room_count=999,
             )
 
         _ = Reservation.create_a_reservation(
-            self.data_dir, "R3", "C1", "H1", room_count=1
+            self.data_dir,
+            "R3",
+            "C1",
+            "H1",
+            room_count=1,
         )
 
         with self.assertRaises(ConflictError):
             Reservation.create_a_reservation(
-                self.data_dir, "R3", "C1", "H1", room_count=1
+                self.data_dir,
+                "R3",
+                "C1",
+                "H1",
+                room_count=1,
             )
 
         _ = Reservation.cancel_a_reservation(self.data_dir, "R3")
@@ -131,8 +180,13 @@ class ReservationSystemTests(unittest.TestCase):
             Reservation.cancel_a_reservation(self.data_dir, "R3")
 
     def test_prevent_delete_if_active_reservation(self) -> None:
+        """Cannot delete hotel/customer when an active reservation exists."""
         _ = Reservation.create_a_reservation(
-            self.data_dir, "R10", "C1", "H1", room_count=1
+            self.data_dir,
+            "R10",
+            "C1",
+            "H1",
+            room_count=1,
         )
 
         with self.assertRaises(ConflictError):
@@ -142,8 +196,8 @@ class ReservationSystemTests(unittest.TestCase):
             Customer.delete_customer(self.data_dir, "C1")
 
     def test_invalid_json_prints_error_and_continues(self) -> None:
+        """Invalid JSON should print an error and continue (no crash)."""
         hotels_path = self.data_dir / "hotels.json"
-
         hotels_path.write_text(
             "{ invalid json",
             encoding="utf-8",
@@ -151,28 +205,36 @@ class ReservationSystemTests(unittest.TestCase):
 
         with patch("builtins.print") as mocked_print:
             hotels = Hotel.load_all(self.data_dir)
+
         self.assertEqual(hotels, [])
         self.assertTrue(mocked_print.called)
 
     def test_invalid_rows_are_skipped(self) -> None:
-        (self.data_dir / "customers.json").write_text(
+        """Invalid rows should be skipped while valid ones are loaded."""
+        customers_path = self.data_dir / "customers.json"
+        customers_path.write_text(
             json.dumps(
                 [
-                    {"customer_id": "C_OK",
-                     "name": "Ok", "email":
-                     "ok@example.com"
-                     },
-                    {"customer_id": "C_BAD",
-                     "name": "Bad",
-                     "email": "not-an-email"
-                     },
+                    {
+                        "customer_id": "C_OK",
+                        "name": "Ok",
+                        "email": "ok@example.com",
+                    },
+                    {
+                        "customer_id": "C_BAD",
+                        "name": "Bad",
+                        "email": "not-an-email",
+                    },
                 ],
                 indent=2,
-            ) + "\n",
+            )
+            + "\n",
             encoding="utf-8",
         )
+
         with patch("builtins.print") as mocked_print:
             customers = Customer.load_all(self.data_dir)
+
         ids = {c.customer_id for c in customers}
         self.assertIn("C_OK", ids)
         self.assertNotIn("C_BAD", ids)

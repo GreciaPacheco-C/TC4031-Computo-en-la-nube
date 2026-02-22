@@ -9,11 +9,13 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional,TYPE_CHECKING
 
 from storage import JsonStore
 from hotel import ConflictError, NotFoundError
-from reservation import Reservation
+
+if TYPE_CHECKING:
+    from reservation import Reservation
 
 @dataclass(frozen=True)
 class Customer:
@@ -87,10 +89,12 @@ class Customer:
 
     @classmethod
     def delete_customer(cls, data_dir: Path, customer_id: str) -> None:
-        """Deletes customer"""
+        """Delete a customer by ID."""
         customers = cls.load_all(data_dir)
         if not any(c.customer_id == customer_id for c in customers):
             raise NotFoundError(f"Customer not found: {customer_id}")
+
+        from reservation import Reservation  # pylint: disable=import-outside-toplevel
 
         if Reservation.has_active_for_customer(data_dir, customer_id):
             raise ConflictError(

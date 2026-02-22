@@ -14,11 +14,15 @@ from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, List
+from typing import TYPE_CHECKING
 
-from source.storage import JsonStore
-from source.hotel import ConflictError, NotFoundError
-from source.hotel import Hotel
-from source.customer import Customer
+from hotel import ConflictError, NotFoundError
+from storage import JsonStore
+
+
+if TYPE_CHECKING:
+    from hotel import Hotel
+    from customer import Customer
 
 
 @dataclass(frozen=True)
@@ -59,6 +63,7 @@ class Reservation:
         )
 
     def to_dict(self) -> Dict[str, Any]:
+        """Returns dic of reservation"""
         return {
             "reservation_id": self.reservation_id,
             "customer_id": self.customer_id,
@@ -70,6 +75,7 @@ class Reservation:
 
     @classmethod
     def load_all(cls, data_dir: Path) -> List["Reservation"]:
+        """Load reservation details"""
         rows = cls._store(data_dir).load_list()
         reservations: List[Reservation] = []
         for idx, row in enumerate(rows):
@@ -90,6 +96,7 @@ class Reservation:
 
     @classmethod
     def has_active_for_hotel(cls, data_dir: Path, hotel_id: str) -> bool:
+        """Reviews if there's active reservation"""
         reservations = cls.load_all(data_dir)
         return any(
             r.hotel_id == hotel_id and r.status == "ACTIVE"
@@ -98,12 +105,15 @@ class Reservation:
 
     @classmethod
     def has_active_for_customer(cls, data_dir: Path, customer_id: str) -> bool:
+        """Reviews if there's active reservation"""
         return any(
             r.customer_id == customer_id and r.status == "ACTIVE"
             for r in cls.load_all(data_dir)
         )
 
     @classmethod
+    # pylint: disable=too-many-arguments
+    # pylint: disable=too-many-positional-arguments
     def create_a_reservation(
         cls,
         data_dir: Path,
@@ -114,6 +124,9 @@ class Reservation:
     ) -> "Reservation":
         """Create reservation and persist."""
         # Validate customer exists
+        from customer import Customer  # pylint: disable=import-outside-toplevel
+        from hotel import Hotel  # pylint: disable=import-outside-toplevel
+
         customers = Customer.load_all(data_dir)
         if not any(c.customer_id == customer_id for c in customers):
             raise NotFoundError(f"Customer not found: {customer_id}")
@@ -150,6 +163,7 @@ class Reservation:
         cls, data_dir: Path, reservation_id: str
     ) -> "Reservation":
         """Cancel reservation and restore hotel availability."""
+        from hotel import Hotel  # pylint: disable=import-outside-toplevel
         reservations = cls.load_all(data_dir)
         found = False
         updated: List[Reservation] = []
