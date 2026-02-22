@@ -1,0 +1,12 @@
+﻿test_conflict_and_not_found_paths (test_reservation_system.ReservationSystemTests.test_conflict_and_not_found_paths) ... ok
+test_customer_crud (test_reservation_system.ReservationSystemTests.test_customer_crud) ... ok
+test_hotel_crud (test_reservation_system.ReservationSystemTests.test_hotel_crud) ... ok
+test_invalid_json_prints_error_and_continues (test_reservation_system.ReservationSystemTests.test_invalid_json_prints_error_and_continues) ... ok
+test_invalid_rows_are_skipped (test_reservation_system.ReservationSystemTests.test_invalid_rows_are_skipped) ... ok
+test_prevent_delete_if_active_reservation (test_reservation_system.ReservationSystemTests.test_prevent_delete_if_active_reservation) ... ok
+test_reservation_create_and_cancel_updates_inventory (test_reservation_system.ReservationSystemTests.test_reservation_create_and_cancel_updates_inventory) ... ok
+System.Management.Automation.RemoteException
+----------------------------------------------------------------------
+Ran 7 tests in 0.121s
+System.Management.Automation.RemoteException
+OK

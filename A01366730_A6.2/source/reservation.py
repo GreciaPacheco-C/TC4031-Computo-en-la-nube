@@ -1,4 +1,4 @@
-"""
+﻿"""
 Reservation class + persistent behaviors (stored in files).
 
 Req 2.3:
@@ -11,7 +11,7 @@ Also supports Hotel.reserve_a_room and cancel restoring inventory.
 from __future__ import annotations
 
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import datetime, timezone, timezone
 from pathlib import Path
 from typing import Any, Dict, List
 
@@ -42,7 +42,7 @@ class Reservation:
         hotel_id = str(row["hotel_id"])
         room_count = int(row["room_count"])
         status = str(row["status"])
-        created_at = str(row["created_at"])
+        created_at = datetime.now(timezone.utc).isoformat(timespec="seconds")
 
         if room_count <= 0:
             raise ValueError("room_count must be positive.")
@@ -118,7 +118,7 @@ class Reservation:
             # rollback hotel decrement? for simplicity, treat as conflict before doing reserve in real system
             raise ConflictError(f"Reservation already exists: {reservation_id}")
 
-        created_at = datetime.utcnow().isoformat(timespec="seconds")
+        created_at = datetime.now(timezone.utc).isoformat(timespec="seconds")
         reservation = cls._from_dict(
             {
                 "reservation_id": reservation_id,

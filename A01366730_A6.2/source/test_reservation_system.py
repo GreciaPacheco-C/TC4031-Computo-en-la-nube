@@ -6,10 +6,10 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 from unittest.mock import patch
 
-from customer import Customer
-from hotel import ConflictError, NotFoundError
-from hotel import Hotel
-from reservation import Reservation
+from source.customer import Customer
+from source.hotel import ConflictError, NotFoundError
+from source.hotel import Hotel
+from source.reservation import Reservation
 
 
 class ReservationSystemTests(unittest.TestCase):
